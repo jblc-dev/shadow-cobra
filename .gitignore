@@ -1,0 +1,9 @@
+# Environments
+.venv/
+venv/
+ENV/
+
+__pycache__/
+build/
+cobra.egg-info/
+spotify_data.csv
