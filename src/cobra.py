@@ -1,7 +1,4 @@
-from utils import DbHelper
-from utils import FilterController
-from utils import GraphController
-from utils import StreamController
+from utils import DbHelper, FilterController, GraphController, StreamController
 
 
 def main():
