@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cobra music explorer</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>Cobra music explorer</h1>
+    <p>Musicmap graph &rarr; genre filter &rarr; random track &rarr; full stream</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Filter settings</h2>
+
+      <label for="genre">Musicmap genre</label>
+      <input id="genre" type="search" list="genreList" value="__DEFAULT_GENRE__" autocomplete="off">
+      <datalist id="genreList"></datalist>
+
+      <div class="filter" data-metric="popularity">
+        <div class="filter-head">
+          <span>Popularity</span>
+          <output class="filter-value"></output>
+        </div>
+        <div class="dual-range">
+          <div class="range-track"></div>
+          <div class="range-fill"></div>
+          <input class="range-min" type="range" min="0" max="100" value="0" aria-label="Popularity minimum">
+          <input class="range-max" type="range" min="0" max="100" value="100" aria-label="Popularity maximum">
+        </div>
+      </div>
+
+      <div class="filter" data-metric="danceability">
+        <div class="filter-head">
+          <span>Danceability</span>
+          <output class="filter-value"></output>
+        </div>
+        <div class="dual-range">
+          <div class="range-track"></div>
+          <div class="range-fill"></div>
+          <input class="range-min" type="range" min="0" max="100" value="0" aria-label="Danceability minimum">
+          <input class="range-max" type="range" min="0" max="100" value="100" aria-label="Danceability maximum">
+        </div>
+      </div>
+
+      <div class="filter" data-metric="energy">
+        <div class="filter-head">
+          <span>Energy</span>
+          <output class="filter-value"></output>
+        </div>
+        <div class="dual-range">
+          <div class="range-track"></div>
+          <div class="range-fill"></div>
+          <input class="range-min" type="range" min="0" max="100" value="0" aria-label="Energy minimum">
+          <input class="range-max" type="range" min="0" max="100" value="100" aria-label="Energy maximum">
+        </div>
+      </div>
+
+      <div class="filter" data-metric="tempo">
+        <div class="filter-head">
+          <span>Tempo</span>
+          <output class="filter-value"></output>
+        </div>
+        <div class="dual-range">
+          <div class="range-track"></div>
+          <div class="range-fill"></div>
+          <input class="range-min" type="range" min="0" max="250" value="0" aria-label="Tempo minimum">
+          <input class="range-max" type="range" min="0" max="250" value="250" aria-label="Tempo maximum">
+        </div>
+      </div>
+
+      <div class="filter" data-metric="year">
+        <div class="filter-head">
+          <span>Year</span>
+          <output class="filter-value"></output>
+        </div>
+        <div class="dual-range">
+          <div class="range-track"></div>
+          <div class="range-fill"></div>
+          <input class="range-min" type="range" min="1900" max="2026" value="1900" aria-label="Year minimum">
+          <input class="range-max" type="range" min="1900" max="2026" value="2026" aria-label="Year maximum">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="apply">Apply filters</button>
+        <button class="good" id="random">Random song</button>
+      </div>
+      <div id="status"></div>
+      <div class="genre-list" id="genreChips"></div>
+    </section>
+
+    <section>
+      <h2>Now playing</h2>
+      <div id="trackBox" class="empty">No song selected yet.</div>
+
+      <div id="trackTemplate" class="track" hidden>
+        <div class="track-artist" id="artist"></div>
+        <div class="track-title" id="title"></div>
+        <div class="chips" id="chips"></div>
+
+        <div class="metrics">
+          <div class="metric"><span>Popularity</span><strong id="mPopularity"></strong></div>
+          <div class="metric"><span>Danceability</span><strong id="mDanceability"></strong></div>
+          <div class="metric"><span>Energy</span><strong id="mEnergy"></strong></div>
+          <div class="metric"><span>Tempo</span><strong id="mTempo"></strong></div>
+          <div class="metric"><span>Year</span><strong id="mYear"></strong></div>
+          <div class="metric"><span>Duration</span><strong id="mDuration"></strong></div>
+        </div>
+
+        <audio id="player" controls preload="none"></audio>
+
+        <div class="actions">
+          <button id="play">Play</button>
+          <button id="stop">Stop</button>
+        </div>
+        <div id="streamStatus" class="stream-status"></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
