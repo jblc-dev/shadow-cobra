@@ -1,13 +1,16 @@
 import csv
 import random
 import os
+from pathlib import Path
 
 from .filter_controller import FilterController
 
+DEFAULT_DB = Path(__file__).resolve().parents[2] / "spotify_data.csv"
+
 class DbHelper:
 
-    def __init__(self, filename="spotify_data.csv"):
-        self.filename = filename
+    def __init__(self, filename=None):
+        self.filename = filename or DEFAULT_DB
         self.tracks = {}
         self.filtered_tracks = {}
         self._load_from_csv()

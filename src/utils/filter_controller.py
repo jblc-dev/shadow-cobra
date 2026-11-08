@@ -1,3 +1,9 @@
+import re
+
+
+
+
+
 class FilterController:
     def __init__(
         self,
@@ -45,6 +51,24 @@ class FilterController:
             if high < low:
                 low = high
         setattr(self, property_name, [low, high])
+    
+    def _genre_matches(filter_genre: str, track_genre: str) -> bool:
+        normalized_filter = str(filter_genre).lower().replace("-", " ").replace("&", " ")
+        normalized_track = str(track_genre).lower().replace("-", " ").replace("&", " ")
+
+        if normalized_filter.strip() in normalized_track:
+            return True
+
+        ignore = {"and", "the", "music", "native"}
+        filter_words = {
+            word for word in re.split(r"[^a-z0-9]+", normalized_filter)
+            if len(word) > 2 and word not in ignore
+        }
+        track_words = {
+            word for word in re.split(r"[^a-z0-9]+", normalized_track)
+            if word
+        }
+        return bool(filter_words & track_words)
 
     def matches(self, track: dict) -> bool:
         for key, value in track.items():
@@ -52,7 +76,7 @@ class FilterController:
                 continue
             filter_val = getattr(self, key)
             if key == "genre":
-                if filter_val.lower() not in str(value).lower():
+                if not _genre_matches(filter_val, value):
                     return False
             else:
                 min_val, max_val = filter_val

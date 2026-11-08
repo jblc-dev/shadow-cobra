@@ -9,8 +9,8 @@ class GraphController:
 
     def __init__(
         self,
-        start: str = "CHICAGO HOUSE & GARAGE HOUSE"
-    ):  
+        genre: str = "CHICAGO HOUSE & GARAGE HOUSE"
+    ):
 
         with open(DATA_FILE, 'r', encoding="utf-8") as f:
             graph_data = json.load(f)
@@ -19,55 +19,60 @@ class GraphController:
 
         for node in graph_data["nodes"]:
             attributes = {
-                "label": node.get("label",""),
-                "genre": node.get("supergenre",""),
-                "year": node.get("year","")
-                }
-            self.G.add_node(node["id"],**attributes)
-
+                "genre": node.get("label", ""),
+                "supergenre": node.get("supergenre", ""),
+                "year": node.get("year", "")
+            }
+            self.G.add_node(node["id"], **attributes)
 
         for edge in graph_data["edges"]:
             self.G.add_edge(edge['source'], edge['target'])
-        
-        self.start=self._resolve_label(start)
 
-    def _resolve_label(self,label):
-        
-        if label is None:
+        self.genre = self._resolve_genre(genre)
+
+    def _resolve_genre(self, genre):
+
+        if genre is None:
             return None
 
-        if label in self.G:
-            return label
+        if genre in self.G:
+            return genre
 
-        needle = str(label).strip().lower()
+        needle = str(genre).strip().lower()
         for node_id, data in self.G.nodes(data=True):
-            if str(data.get("label", "")).strip().lower() == needle:
+            if str(data.get("genre", "")).strip().lower() == needle:
                 return node_id
-            
-   
+
         return None
 
-    def _resolve_id(self,id):
-        return self.G[id].get("label")
-        
+    def _resolve_id(self, id, super_=False):
 
-    def set_start(self, start: str):
-        self.start = self._resolve_label(start)
+        if super_:
+            return self.G.nodes[id].get("supergenre")
+        return self.G.nodes[id].get("genre")
+
+    def get_genre(self):
+        return self._resolve_id(self.genre) if self.genre else None
+
+    def set_genre(self, genre: str):
+        self.genre = self._resolve_genre(genre)
 
     def walk_to_node(self, target_):
-        if not target_ or self.start is None:
+        if not target_ or self.genre is None:
+            return
+
+        target = self._resolve_genre(target_)
+        if target is None:
+            print(f"Unknown genre: '{target_}'")
             return
 
         try:
-            target=self._resolve_label(target_)
-            path = nx.shortest_path(self.G, source=self.start, target=target)
-        except nx.NodeNotFound as exc:
-            print(f"Unknown node: {exc}")
-            return
+            path = nx.shortest_path(self.G, source=self.genre, target=target)
         except nx.NetworkXNoPath:
-            print(f"No path exists between '{self._resolve_id(self.start)}' and '{self._resolve_id(target)}'.")
+            print(f"No path exists between '{self._resolve_id(self.genre)}' and '{self._resolve_id(target)}'.")
             return
 
-        print(f"Path from '{self._resolve_id(self.start)}' to '{self._resolve_id(target)}':")
-       
-        print(" -> ".join(path))
+        print(f"Path from '{self._resolve_id(self.genre)}' to '{self._resolve_id(target)}':")
+        print(" -> ".join(self._resolve_id(node_id) for node_id in path))
+
+        self.genre = target
