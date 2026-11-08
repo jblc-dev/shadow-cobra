@@ -1,6 +1,7 @@
 from utils import DbHelper
 from utils import FilterController
 from utils import GraphController
+from utils import StreamController
 
 
 def main():
@@ -12,14 +13,15 @@ def main():
     db.filter_tracks(filters)
 
     track = db.get_track_random()
+
     if track is None:
         print(f"No tracks found for genres {genres}.")
         return
 
-    print(
-        f"{track['artist_name']} - {track['track_name']} "
-        f"({track['year']}) [{track['genre']}]"
-    )
+    query = f"{track['artist_name']} {track['track_name']} ({track['year']}) [{track['genre']}]"
+    print(f"Searching for ... {query}")
+    sc = StreamController
+    sc.stream_audio(query)
 
 
 if __name__ == "__main__":
