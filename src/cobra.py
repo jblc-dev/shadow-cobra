@@ -1,9 +1,12 @@
 from utils import FilterController
 from utils import DbHelper
-import pandas as pd
+from utils import GraphController
 
 
 def main():
+    gc = GraphController()
+    gc.walk_to_node("JAZZ RAP / NATIVE TONGUE")
+
 
 
 
