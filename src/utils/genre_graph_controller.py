@@ -1,9 +1,9 @@
 from pathlib import Path
 import json
-import re
 import networkx as nx
 
 DATA_FILE = Path(__file__).resolve().parent.parent / "data" / "musicmap-graph.json"
+CLEANED_DATA_FILE = DATA_FILE.with_name("musicmap-graph-cleaned.json")
 
 
 class GraphController:
@@ -28,6 +28,18 @@ class GraphController:
 
         for edge in graph_data["edges"]:
             self.G.add_edge(edge['source'], edge['target'])
+
+        with open(CLEANED_DATA_FILE, 'r', encoding="utf-8") as f:
+            cleaned_data = json.load(f)
+
+        self.clean_G = nx.Graph()
+        for node in cleaned_data["nodes"]:
+            self.clean_G.add_node(
+                node["id"],
+                genres=node.get("genres", []),
+                supergenre_genres=node.get("supergenre_genres", []),
+                filter_genres=node.get("filter_genres", []),
+            )
 
         self.genre = self._resolve_genre(genre)
         self.path = []
@@ -67,34 +79,10 @@ class GraphController:
             return self._resolve_id(supergenre_id)
         return supergenre_id
 
-   
-    def _clean_genre(value):
-        value = str(value).strip().lower()
-        value = re.sub(r"\([^)]*\)", " ", value)
-        value = re.sub(r"[^a-z0-9]+", " ", value)
-        value = re.sub(r"\bn\b", "and", value)
-        value = re.sub(r"\s+", " ", value).strip()
-        return re.sub(r"\s+(music|genre)$", "", value)
-
-    def _genre_terms(self, label):
-        terms = []
-        if not label:
-            return terms
-
-        without_parens = re.sub(r"\([^)]*\)", " ", label)
-        for candidate in [without_parens] + re.split(r"[&/]", without_parens):
-            term = self._clean_genre(candidate)
-            if term and term not in terms:
-                terms.append(term)
-        return terms
-
     def get_genres(self):
-        genres = []
-        for label in (self.get_genre(), self.get_supergenre()):
-            for term in self._genre_terms(label):
-                if term not in genres:
-                    genres.append(term)
-        return genres
+        if not self.genre or self.genre not in self.clean_G:
+            return []
+        return list(self.clean_G.nodes[self.genre].get("filter_genres", []))
 
     def set_genre(self, genre: str):
         self.genre = self._resolve_genre(genre)

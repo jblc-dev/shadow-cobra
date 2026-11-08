@@ -9,8 +9,6 @@ The site is a static single-page app:
   * master-genrelist.json contains per-genre metadata (name, year, description,
     playlists) and the super-genre -> genre hierarchy.
 
-Nothing on the site is an actual graph database; the graph is encoded visually
-in the SVG. This script reconstructs it as machine-readable data.
 
 Usage:
     python3 tools/fetch_musicmap_graph.py
@@ -19,9 +17,6 @@ Usage:
     python3 tools/fetch_musicmap_graph.py --include-descriptions
     python3 tools/fetch_musicmap_graph.py --include-media
 
-NOTE: musicmap.info content is copyright (c) Kwinten Crauwels, all rights
-reserved. Use the extracted data for personal study/research only and ask the
-author for permission before redistributing it.
 """
 from __future__ import annotations
 
