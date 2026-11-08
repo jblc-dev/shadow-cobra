@@ -40,6 +40,7 @@ class DbHelper:
                     "tempo": float(row.get("tempo") or 0.0),
                     "duration_ms": int(row.get("duration_ms") or 0)
                 }
+        print("Data loaded...")
     def filter_tracks(self, filter_: FilterController):
         self.filtered_tracks = {}
         

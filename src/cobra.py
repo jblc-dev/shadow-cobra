@@ -6,12 +6,14 @@ from utils import GraphController
 def main():
     gc = GraphController()
     db = DbHelper()
-    filters = FilterController(genre=gc.get_genre())
+    genres = gc.get_genres()
+    print(genres)
+    filters = FilterController(genre=genres)
     db.filter_tracks(filters)
 
     track = db.get_track_random()
     if track is None:
-        print(f"No tracks found for genre '{gc.get_genre()}'.")
+        print(f"No tracks found for genres {genres}.")
         return
 
     print(

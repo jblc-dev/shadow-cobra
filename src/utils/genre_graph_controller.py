@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import re
 import networkx as nx
 
 DATA_FILE = Path(__file__).resolve().parent.parent / "data" / "musicmap-graph.json"
@@ -29,9 +30,10 @@ class GraphController:
             self.G.add_edge(edge['source'], edge['target'])
 
         self.genre = self._resolve_genre(genre)
+        self.path = []
+        self.genres = []
 
     def _resolve_genre(self, genre):
-
         if genre is None:
             return None
 
@@ -53,6 +55,46 @@ class GraphController:
 
     def get_genre(self):
         return self._resolve_id(self.genre) if self.genre else None
+
+    def get_supergenre(self):
+        if not self.genre:
+            return None
+
+        supergenre_id = self._resolve_id(self.genre, super_=True)
+        if not supergenre_id:
+            return None
+        if supergenre_id in self.G:
+            return self._resolve_id(supergenre_id)
+        return supergenre_id
+
+   
+    def _clean_genre(value):
+        value = str(value).strip().lower()
+        value = re.sub(r"\([^)]*\)", " ", value)
+        value = re.sub(r"[^a-z0-9]+", " ", value)
+        value = re.sub(r"\bn\b", "and", value)
+        value = re.sub(r"\s+", " ", value).strip()
+        return re.sub(r"\s+(music|genre)$", "", value)
+
+    def _genre_terms(self, label):
+        terms = []
+        if not label:
+            return terms
+
+        without_parens = re.sub(r"\([^)]*\)", " ", label)
+        for candidate in [without_parens] + re.split(r"[&/]", without_parens):
+            term = self._clean_genre(candidate)
+            if term and term not in terms:
+                terms.append(term)
+        return terms
+
+    def get_genres(self):
+        genres = []
+        for label in (self.get_genre(), self.get_supergenre()):
+            for term in self._genre_terms(label):
+                if term not in genres:
+                    genres.append(term)
+        return genres
 
     def set_genre(self, genre: str):
         self.genre = self._resolve_genre(genre)
@@ -76,3 +118,4 @@ class GraphController:
         print(" -> ".join(self._resolve_id(node_id) for node_id in path))
 
         self.genre = target
+        self.path = path

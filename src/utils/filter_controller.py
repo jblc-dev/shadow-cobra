@@ -1,9 +1,3 @@
-import re
-
-
-
-
-
 class FilterController:
     def __init__(
         self,
@@ -12,7 +6,7 @@ class FilterController:
         energy: list = None,
         tempo: list = None,
         year: list = None,
-        genre: str = "acoustic",
+        genre="acoustic",
         bpm: list = None,
     ):
         self.popularity = popularity if popularity else [0, 100]
@@ -27,7 +21,7 @@ class FilterController:
         if not hasattr(self, property_name):
             return
         if property_name == "genre":
-            if isinstance(min, str):
+            if isinstance(min, (str, list, tuple, set)):
                 self.genre = min
             return
 
@@ -40,35 +34,17 @@ class FilterController:
             return
 
         low, high = current_range[0], current_range[1]
-        
+
         if min >= 0:
             low = min
             if low > high:
                 high = low
-        
+
         if max >= 0:
             high = max
             if high < low:
                 low = high
         setattr(self, property_name, [low, high])
-    
-    def _genre_matches(filter_genre: str, track_genre: str) -> bool:
-        normalized_filter = str(filter_genre).lower().replace("-", " ").replace("&", " ")
-        normalized_track = str(track_genre).lower().replace("-", " ").replace("&", " ")
-
-        if normalized_filter.strip() in normalized_track:
-            return True
-
-        ignore = {"and", "the", "music", "native"}
-        filter_words = {
-            word for word in re.split(r"[^a-z0-9]+", normalized_filter)
-            if len(word) > 2 and word not in ignore
-        }
-        track_words = {
-            word for word in re.split(r"[^a-z0-9]+", normalized_track)
-            if word
-        }
-        return bool(filter_words & track_words)
 
     def matches(self, track: dict) -> bool:
         for key, value in track.items():
@@ -76,10 +52,13 @@ class FilterController:
                 continue
             filter_val = getattr(self, key)
             if key == "genre":
-                if not _genre_matches(filter_val, value):
+                track_genres = (
+                    value if isinstance(value, (list, tuple, set)) else [value]
+                )
+                if not any(genre in filter_val for genre in track_genres):
                     return False
             else:
                 min_val, max_val = filter_val
                 if not (min_val <= value <= max_val):
-                    return False         
+                    return False
         return True
