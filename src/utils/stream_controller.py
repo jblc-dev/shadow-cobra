@@ -1,7 +1,30 @@
 import subprocess
 class StreamController:
 
-    def stream_audio(query: str) -> bytes:
+    def __init__(
+        self,
+        MAX_QUEUE_SIZE=10
+    ):
+        self.queryQueue = []
+        self.MAX_QUEUE_SIZE=MAX_QUEUE_SIZE
+        self.queue_capacity=MAX_QUEUE_SIZE
+
+        
+
+
+    def addSong(self,query:str):
+        if query None:
+            return
+        
+        if self.queue_capacity >0:
+            self.queryQueue.append(query)
+            self.queue_capacity-=1
+
+    def checkCapacity(self):
+        return self.queue_capacity
+
+
+    def _stream_audio(query: str) -> bytes:
         ytdlp = subprocess.Popen(
             [
                 "yt-dlp",
