@@ -1,4 +1,4 @@
-"""Filesystem locations shared by the package."""
+
 
 from pathlib import Path
 
