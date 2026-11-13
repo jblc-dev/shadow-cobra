@@ -16,8 +16,8 @@ For every node it writes:
 look up ``filter_genres`` in this cleaned graph.
 
 Usage:
-    python3 src/utils/tools/build_cleaned_graph.py
-    python3 src/utils/tools/build_cleaned_graph.py --input path/to/graph.json \
+    python3 tools/build_cleaned_graph.py
+    python3 tools/build_cleaned_graph.py --input path/to/graph.json \
         --output path/to/graph-cleaned.json
 """
 from __future__ import annotations
@@ -28,7 +28,7 @@ import json
 import re
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parents[2] / "data"
+DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DEFAULT_INPUT = DATA_DIR / "musicmap-graph.json"
 DEFAULT_OUTPUT = DATA_DIR / "musicmap-graph-cleaned.json"
 

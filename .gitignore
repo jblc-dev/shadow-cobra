@@ -5,5 +5,5 @@ ENV/
 
 __pycache__/
 build/
-cobra.egg-info/
-spotify_data.csv
+*.egg-info/
+data/spotify_data.csv

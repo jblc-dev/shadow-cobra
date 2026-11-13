@@ -1,4 +1,10 @@
-from utils import DbHelper, FilterController, GraphController, StreamController
+"""Command-line entry point.
+
+Run with:
+    .venv/bin/python -m cobra.cli
+"""
+
+from cobra import DbHelper, FilterController, GraphController, StreamController
 
 
 def main():

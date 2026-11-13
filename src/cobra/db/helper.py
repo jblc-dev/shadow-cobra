@@ -1,11 +1,11 @@
 import csv
 import random
 import os
-from pathlib import Path
 
-from .filter_controller import FilterController
+from cobra.filters.controller import FilterController
+from cobra.paths import DATA_DIR
 
-DEFAULT_DB = Path(__file__).resolve().parents[2] / "spotify_data.csv"
+DEFAULT_DB = DATA_DIR / "spotify_data.csv"
 
 class DbHelper:
 

@@ -22,7 +22,7 @@ class StreamController:
 
 
     def addSong(self,query:str):
-        if query None:
+        if query is None:
             return
         
         if self.queue_capacity >0:

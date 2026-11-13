@@ -1,10 +1,9 @@
 """Simple local web GUI for testing the music utilities.
 
 Run with:
-    .venv/bin/python src/gui.py
+    .venv/bin/python -m cobra.web.server
 
-The frontend lives in src/web/ (index.html, style.css, app.js).
-Existing utility code is not modified.
+The frontend lives in src/cobra/web/static/ (index.html, style.css, app.js).
 """
 
 import argparse
@@ -18,10 +17,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-from utils import DbHelper, FilterController, GraphController, StreamController
+from cobra import DbHelper, FilterController, GraphController, StreamController
 
 
-WEB_DIR = Path(__file__).resolve().parent / "web"
+WEB_DIR = Path(__file__).resolve().parent / "static"
 
 STATIC_FILES = {
     "/": ("index.html", "text/html; charset=utf-8"),

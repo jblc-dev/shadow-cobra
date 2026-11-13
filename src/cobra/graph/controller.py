@@ -1,9 +1,10 @@
-from pathlib import Path
 import json
 import networkx as nx
 
-DATA_FILE = Path(__file__).resolve().parent.parent / "data" / "musicmap-graph.json"
-CLEANED_DATA_FILE = DATA_FILE.with_name("musicmap-graph-cleaned.json")
+from cobra.paths import DATA_DIR
+
+DATA_FILE = DATA_DIR / "musicmap-graph.json"
+CLEANED_DATA_FILE = DATA_DIR / "musicmap-graph-cleaned.json"
 
 
 class GraphController:

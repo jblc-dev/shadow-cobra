@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "cobra"
 version = "0.0.1"
@@ -6,9 +10,15 @@ readme = "README.md"
 requires-python = ">=3"
 dependencies = [
    "networkx",
-   "json",
    "yt-dlp"
 ]
 
+[project.scripts]
+cobra = "cobra.cli:main"
+cobra-gui = "cobra.web.server:main"
+
 [project.optional-dependencies]
 dev = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
