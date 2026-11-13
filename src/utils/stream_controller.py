@@ -1,13 +1,22 @@
+import queue
 import subprocess
+import threading
+import time
+
 class StreamController:
 
     def __init__(
         self,
-        MAX_QUEUE_SIZE=10
+        MAX_QUEUE_SIZE=10,
+        MAX_WORKERS=3
     ):
-        self.queryQueue = []
+        self.queryQueue = queue.Queue()
         self.MAX_QUEUE_SIZE=MAX_QUEUE_SIZE
         self.queue_capacity=MAX_QUEUE_SIZE
+        self.MAX_WORKERS =MAX_WORKERS
+        self._isRunning =True
+        
+         
 
         
 
