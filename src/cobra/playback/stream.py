@@ -3,38 +3,21 @@ import subprocess
 import threading
 import time
 
-class StreamController:
+class StreamWorker:
 
-    def __init__(
-        self,
-        MAX_QUEUE_SIZE=10,
-        MAX_WORKERS=3
-    ):
-        self.queryQueue = queue.Queue()
-        self.MAX_QUEUE_SIZE=MAX_QUEUE_SIZE
-        self.queue_capacity=MAX_QUEUE_SIZE
-        self.MAX_WORKERS =MAX_WORKERS
-        self._isRunning =True
+    def __init__(self):
+
+        self.stream = None
+
+    def start(self):
+
+        while True:
+            try:
+                
         
-         
+    def _start(self,query):
 
-        
-
-
-    def addSong(self,query:str):
-        if query is None:
-            return
-        
-        if self.queue_capacity >0:
-            self.queryQueue.append(query)
-            self.queue_capacity-=1
-
-    def checkCapacity(self):
-        return self.queue_capacity
-
-
-    def _stream_audio(query: str) -> bytes:
-        ytdlp = subprocess.Popen(
+        self.stream = subprocess.Popen(
             [
                 "yt-dlp",
                 "--no-playlist",
@@ -47,21 +30,20 @@ class StreamController:
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
         )
+    
+    def prefetch(self,query):
+        self._cleanup()
+        self.start(query)
 
-        mpv = subprocess.Popen(
-        [
-            "mpv",
-            "--no-video",       
-            "--really-quiet",      
-            "-",                   
-        ],
-        stdin=ytdlp.stdout,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    def healthcheck(self):
+        if self.stream is not None and not self.is_running():
+            self._cleanup()
+    def _cleanup(self):
+        self.stream = None
 
-        ytdlp.stdout.close()
-        audio = mpv.stdout.read()
-        ytdlp.wait()
-        mpv.wait()
-        return audio
+    def is_running(self):
+        if self.stream is None:
+            return False
+        
+        return self.stream.poll() is None
+        
