@@ -1,4 +1,11 @@
 from .mpv import MPVPlayerController
-from .stream import StreamController
+from .player import MusicPlayer
+from .stream import StreamWorker
+from .stream_manager import StreamManager
 
-__all__ = ["MPVPlayerController", "StreamController"]
+__all__ = [
+    "MPVPlayerController",
+    "MusicPlayer",
+    "StreamManager",
+    "StreamWorker",
+]

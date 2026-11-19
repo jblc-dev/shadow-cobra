@@ -4,7 +4,7 @@ Run with:
     .venv/bin/python -m cobra.cli
 """
 
-from cobra import DbHelper, FilterController, GraphController, StreamController
+from cobra import DbHelper, FilterController, GraphController, MusicPlayer
 
 
 def main():
@@ -23,8 +23,12 @@ def main():
 
     query = f"{track['artist_name']} {track['track_name']} ({track['year']}) [{track['genre']}]"
     print(f"Searching for ... {query}")
-    sc = StreamController
-    sc.stream_audio(query)
+    player = MusicPlayer()
+    try:
+        if player.play(track):
+            player.wait()
+    finally:
+        player.stop()
 
 
 if __name__ == "__main__":

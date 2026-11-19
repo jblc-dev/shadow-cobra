@@ -17,7 +17,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-from cobra import DbHelper, FilterController, GraphController, StreamController
+from cobra import DbHelper, FilterController, GraphController
 
 
 WEB_DIR = Path(__file__).resolve().parent / "static"
@@ -36,7 +36,6 @@ class MusicApp:
         self.graph = GraphController()
         print("Loading track database...")
         self.db = DbHelper()
-        self.stream = StreamController()
         self.lock = threading.Lock()
         self.genres = []
         self.count = 0
@@ -95,15 +94,7 @@ class MusicApp:
         return self._resolve_stream_url(track)
 
     def _resolve_stream_url(self, track):
-        # Use the project's StreamController when it exposes a resolver.
-        resolver = getattr(self.stream, "get_stream_url", None)
-        if callable(resolver):
-            try:
-                return resolver(track)
-            except Exception:
-                pass
-
-        # Fallback: resolve a direct audio URL with yt-dlp ourselves.
+        # Resolve a direct audio URL with yt-dlp; the browser plays it itself.
         yt_dlp = Path(sys.executable).parent / "yt-dlp"
         if not yt_dlp.exists():
             yt_dlp = shutil.which("yt-dlp") or "yt-dlp"

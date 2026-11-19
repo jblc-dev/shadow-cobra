@@ -9,6 +9,7 @@ class MPVPlayerController:
         self.process =None
         self.socket_path = "/tmp/mpv-socket"
     def start_player(self,stream_stdout):
+        self.clean_up()
         try:
             self.process = subprocess.Popen(
                 [

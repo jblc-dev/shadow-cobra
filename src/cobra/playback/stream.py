@@ -1,23 +1,16 @@
-import queue
 import subprocess
-import threading
-import time
+
 
 class StreamWorker:
-
+  
     def __init__(self):
+        self.process = None
+        self._owned = False
 
-        self.stream = None
-
-    def start(self):
-
-        while True:
-            try:
-                
-        
-    def _start(self,query):
-
-        self.stream = subprocess.Popen(
+    def start(self, query):
+        self._cleanup()
+        self.query = query
+        self.process = subprocess.Popen(
             [
                 "yt-dlp",
                 "--no-playlist",
@@ -30,20 +23,44 @@ class StreamWorker:
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
         )
-    
-    def prefetch(self,query):
-        self._cleanup()
-        self.start(query)
+        self._owned = True
+        return self.process
+
+    def prefetch(self, query):
+        return self.start(query)
+
+    def take_stream(self):
+        if not self._owned or self.process is None:
+            return None
+        self._owned = False
+        return self.process.stdout
 
     def healthcheck(self):
-        if self.stream is not None and not self.is_running():
+        if self._owned and self.process is not None and self.process.poll() is not None:
             self._cleanup()
-    def _cleanup(self):
-        self.stream = None
+        return self.is_running()
 
     def is_running(self):
-        if self.stream is None:
-            return False
-        
-        return self.stream.poll() is None
-        
+        return (
+            self._owned
+            and self.process is not None
+            and self.process.poll() is None
+        )
+
+    def _cleanup(self):
+        process = self.process
+        if process is not None:
+            if process.stdout is not None:
+                try:
+                    process.stdout.close()
+                except OSError:
+                    pass
+            if process.poll() is None:
+                try:
+                    process.terminate()
+                    process.wait(timeout=2)
+                except (OSError, subprocess.TimeoutExpired):
+                    process.kill()
+                    process.wait()
+        self.process = None
+        self._owned = False
