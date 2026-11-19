@@ -1,3 +1,4 @@
+import logging
 import queue
 import threading
 import time
@@ -32,8 +33,11 @@ class StreamManager:
         with self._cond:
             self.is_running = False
             self._cond.notify_all()
-        if self._thread is not None and self._thread is not threading.current_thread():
-            self._thread.join(timeout=2)
+        thread = self._thread
+        if thread is not None and thread is not threading.current_thread():
+            thread.join(timeout=2)
+            if thread.is_alive():
+                logging.warning("stream-manager thread did not stop within 2s")
         with self._cond:
             self.active._cleanup()
             self.standby._cleanup()
@@ -59,14 +63,19 @@ class StreamManager:
                 if self.standby.is_running():
                     self.queue.put(track)
                 else:
-                    self.standby.prefetch(self._query(track))
+                    try:
+                        self.standby.prefetch(track)
+                    except Exception:
+                        logging.exception("Failed to prefetch track: %r", track)
                 self._cond.notify_all()
 
     def add_track(self, track):
-        self.queue.put(track)
+        
+        with self._cond:
+            self.queue.put(track)
+            self._cond.notify_all()
 
     def get_active_stream(self, timeout=10.0):
-        
         deadline = time.monotonic() + timeout
         with self._cond:
             while True:
@@ -83,7 +92,7 @@ class StreamManager:
 
                 track = self._next_track_locked()
                 if track is not None:
-                    self.standby.prefetch(self._query(track))
+                    self.active.prefetch(track)
                     self._active_in_use = True
                     self._cond.notify_all()
                     return self.active.take_stream()
@@ -100,8 +109,6 @@ class StreamManager:
             self._cond.notify_all()
             return self._active_in_use
 
-    
-
     def _promote_locked(self):
         self.active._cleanup()
         self.active, self.standby = self.standby, self.active
@@ -111,4 +118,3 @@ class StreamManager:
             return self.queue.get_nowait()
         except queue.Empty:
             return None
-

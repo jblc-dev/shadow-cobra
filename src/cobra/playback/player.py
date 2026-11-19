@@ -1,11 +1,10 @@
 import queue
-import threading
 
 from cobra.playback.mpv import MPVPlayerController
 from cobra.playback.stream_manager import StreamManager
 
 
-class MusicPlayer
+class MusicPlayer:
 
     def __init__(self):
         self.queue = queue.Queue()
@@ -35,7 +34,7 @@ class MusicPlayer
     def skip(self):
         self.mpv.clean_up()
         self.worker_manager.skip()
-        stream_pipe = self.worker_manager.get_active_stream()
+        stream_pipe = self.worker_manager.get_active_stream(timeout=1.0)
         if stream_pipe is not None:
             self.mpv.start_player(stream_pipe)
 

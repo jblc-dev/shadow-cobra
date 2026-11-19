@@ -34,7 +34,27 @@ class MPVPlayerController:
         return self.process.poll() is None
     
     def clean_up(self):
+        process = self.process
         self.process = None
+        if process is not None:
+            if process.stdin is not None:
+                try:
+                    process.stdin.close()
+                except OSError:
+                    pass
+            if process.poll() is None:
+                try:
+                    process.terminate()
+                    process.wait(timeout=2)
+                except (OSError, subprocess.TimeoutExpired):
+                    process.kill()
+                    process.wait()
+
+        if os.path.exists(self.socket_path):
+            try:
+                os.unlink(self.socket_path)
+            except OSError:
+                pass
     
     def pause_song(self):
         self._send_mpv_command({"command": ["set_property", "pause", True]})
@@ -44,7 +64,7 @@ class MPVPlayerController:
     
     def set_volume(self, level: int):
         level = max(0, min(100, level))
-        self._send_command({"command": ["set_property", "volume", level]})
+        self._send_mpv_command({"command": ["set_property", "volume", level]})
     
     def _send_mpv_command(self,command_dict):
         if os.path.exists(self.socket_path):
