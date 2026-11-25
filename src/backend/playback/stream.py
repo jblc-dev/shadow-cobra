@@ -1,4 +1,5 @@
 import subprocess
+import sys
 
 
 class StreamWorker:
@@ -12,7 +13,9 @@ class StreamWorker:
         self.query = query
         self.process = subprocess.Popen(
             [
-                "yt-dlp",
+                sys.executable,
+                "-m",
+                "yt_dlp",
                 "--no-playlist",
                 "--quiet",
                 "--no-warnings",

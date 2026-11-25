@@ -3,6 +3,7 @@ import subprocess
 import json
 import socket
 import os
+import shutil
 class MPVPlayerController:
 
     def __init__(self):
@@ -10,6 +11,10 @@ class MPVPlayerController:
         self.socket_path = "/tmp/mpv-socket"
     def start_player(self,stream_stdout):
         self.clean_up()
+        if shutil.which("mpv") is None:
+            logging.error("mpv not found on PATH; install mpv to play audio")
+            self.process = None
+            return False
         try:
             self.process = subprocess.Popen(
                 [
@@ -26,6 +31,8 @@ class MPVPlayerController:
         except Exception as e:
             logging.error(f"Failed to start MPV: {e}")
             self.process = None
+            return False
+        return True
 
     def is_running(self):
         if self.process is None:

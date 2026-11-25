@@ -1,3 +1,4 @@
+import logging
 import queue
 
 from cobra.playback.mpv import MPVPlayerController
@@ -16,11 +17,14 @@ class MusicPlayer:
         self.queue.put(track)
 
     def play(self):
-        stream_pipe = self.worker_manager.get_active_stream()
+        try:
+            stream_pipe = self.worker_manager.get_active_stream()
+        except Exception:
+            logging.exception("Failed to prepare stream")
+            return False
         if stream_pipe is None:
             return False
-        self.mpv.start_player(stream_pipe)
-        return True
+        return self.mpv.start_player(stream_pipe)
 
     def pause(self):
         self.mpv.pause_song()
